@@ -2,3 +2,11 @@ name = "CANUtils"
 uuid = "cda4bd93-d5c6-49f2-9dbf-c90406d773d0"
 version = "0.1.0"
 authors = ["A-C1 <aditya2192@gmail.com>"]
+
+[deps]
+FixedSizeArrays = "3821ddf9-e5b5-40d5-8e25-6813ab96b5e2"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[compat]
+FixedSizeArrays = "1.3.0"
+Printf = "1.11.0"
