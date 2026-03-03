@@ -45,6 +45,21 @@ using FixedSizeArrays
             @test contains(s, "RPM")
             @test contains(s, "StartByte")
         end
+
+        @testset "validation" begin
+            @test_throws ArgumentError Signal("", 1, 1, 8, 1.0, 0.0)         # empty name
+            @test_throws ArgumentError Signal("X", 0, 1, 8, 1.0, 0.0)        # start_byte < 1
+            @test_throws ArgumentError Signal("X", 9, 1, 8, 1.0, 0.0)        # start_byte > 8
+            @test_throws ArgumentError Signal("X", 1, 0, 8, 1.0, 0.0)        # start_bit < 1
+            @test_throws ArgumentError Signal("X", 1, 9, 8, 1.0, 0.0)        # start_bit > 8
+            @test_throws ArgumentError Signal("X", 1, 1, 0, 1.0, 0.0)        # length < 1
+            @test_throws ArgumentError Signal("X", 1, 1, 65, 1.0, 0.0)       # length > 64
+            @test_throws ArgumentError Signal("X", 8, 2, 8, 1.0, 0.0)        # exceeds 64-bit boundary
+            # Valid edge cases
+            @test Signal("Y", 1, 1, 64, 1.0, 0.0) isa Signal                 # full 64 bits from bit 0
+            @test Signal("Z", 8, 1, 8, 1.0, 0.0) isa Signal                  # last byte exactly
+            @test Signal() isa Signal                                          # default sentinel
+        end
     end
 
     # =========================================================================
@@ -127,6 +142,12 @@ using FixedSizeArrays
             val = typemax(UInt64)
             @test extract_bits(val, 0, 64) == val
         end
+
+        @testset "bounds checking" begin
+            @test_throws ArgumentError extract_bits(UInt64(0), 60, 8)   # 60+8=68 > 64
+            @test_throws ArgumentError extract_bits(UInt64(0), -1, 8)   # negative startbit
+            @test extract_bits(UInt64(0), 56, 8) == UInt64(0)           # 56+8=64, valid
+        end
     end
 
     @testset "extract_signal" begin
@@ -193,6 +214,13 @@ using FixedSizeArrays
 
         @testset "single bit" begin
             @test add_bits(UInt64(0), UInt64(1), 5, 1) == UInt64(1 << 5)
+        end
+
+        @testset "bounds checking" begin
+            @test_throws ArgumentError add_bits(UInt64(0), UInt64(1), 60, 8)    # 60+8=68 > 64
+            @test_throws ArgumentError add_bits(UInt64(0), UInt64(1), -1, 8)    # negative startbit
+            @test_throws ArgumentError add_bits(UInt64(0), UInt64(0x1FF), 0, 8) # 0x1FF > 255 for 8 bits
+            @test add_bits(UInt64(0), UInt64(0xFF), 56, 8) == UInt64(0xFF) << 56  # boundary valid
         end
     end
 
