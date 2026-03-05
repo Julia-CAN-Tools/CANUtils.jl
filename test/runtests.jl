@@ -352,4 +352,38 @@ using FixedSizeArrays
         end
     end
 
+    # =========================================================================
+    # Sentinel Signal safety
+    # =========================================================================
+    @testset "sentinel Signal safety" begin
+        sentinel = Signal()
+        data_g = UInt64(0xDEADBEEFCAFEBABE)
+
+        @testset "extract_signal returns zero for sentinel" begin
+            @test extract_signal(data_g, sentinel) == UInt64(0)
+        end
+
+        @testset "add_signal returns data unchanged for sentinel" begin
+            @test add_signal(data_g, UInt64(0), sentinel) == data_g
+        end
+    end
+
+    # =========================================================================
+    # Type stability
+    # =========================================================================
+    @testset "type stability" begin
+        data_g = UInt64(0x0807060504030201)
+        sig = Signal("TypeTest", 1, 1, 16, 0.125, 0.0)
+        data_vec = UInt8[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]
+        data_tup = (0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
+
+        @test @inferred(extract_bits(data_g, 0, 16)) isa UInt64
+        @test @inferred(extract_signal(data_g, sig)) isa UInt64
+        @test @inferred(data_to_int(data_vec)) isa UInt64
+        @test @inferred(data_to_int(data_tup)) isa UInt64
+        @test @inferred(add_bits(UInt64(0), UInt64(0xFF), 0, 8)) isa UInt64
+        @test @inferred(add_signal(UInt64(0), UInt64(0xFF), sig)) isa UInt64
+        @test @inferred(uint_to_payload(data_g)) isa FixedSizeArrays.FixedSizeArray{UInt8}
+    end
+
 end

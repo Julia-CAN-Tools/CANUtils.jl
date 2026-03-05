@@ -31,7 +31,7 @@ extract_bits(data_g, 0, 16)  # 0xFF03 — first two bytes
 extract_bits(data_g, 4, 4)   # 0x00 — bits 4-7 of first byte
 ```
 """
-function extract_bits(data_g::UInt64, startbit_g::Integer, length::Integer)
+@inline function extract_bits(data_g::UInt64, startbit_g::Integer, length::Integer)
     length < 1 && return UInt64(0)
     (startbit_g >= 0 && startbit_g + length <= 64) || throw(ArgumentError(
         "Bit range [$startbit_g, $(startbit_g + length)) exceeds 64-bit data word"))
@@ -65,12 +65,13 @@ raw = extract_signal(data_g, sig)  # 4096
 physical = Float64(raw) * sig.scaling + sig.offset  # 512.0 RPM
 ```
 """
-function extract_signal(data_g::UInt64, sig::Signal)
+@inline function extract_signal(data_g::UInt64, sig::Signal)
+    sig.length == 0 && return UInt64(0)
     startbit_g = UInt64(sig.start_byte - 1) * UInt64(8) + UInt64(sig.start_bit - 1)
     return extract_bits(data_g, startbit_g, sig.length)
 end
 
-@inline function _accumulate_bytes(iter)
+@inline function _accumulate_bytes(iter)::UInt64
     value = UInt64(0)
     i = 0
     for byte in iter

@@ -31,7 +31,7 @@ data_g = add_bits(data_g, UInt64(0xAB), 8, 8)   # set byte 2 to 0xAB
 extract_bits(data_g, 0, 16)  # 0xABFF
 ```
 """
-function add_bits(data_g::UInt64, sigbits::UInt64, startbit_g::Integer, length::Integer)
+@inline function add_bits(data_g::UInt64, sigbits::UInt64, startbit_g::Integer, length::Integer)
     length < 1 && return data_g
     (startbit_g >= 0 && startbit_g + length <= 64) || throw(ArgumentError(
         "Bit range [$startbit_g, $(startbit_g + length)) exceeds 64-bit data word"))
@@ -71,7 +71,8 @@ data_g = add_signal(data_g, UInt64(8000), sig)  # 1000 RPM / 0.125 = 8000 raw
 payload = uint_to_payload(data_g)               # ready for CanFrame
 ```
 """
-function add_signal(data_g::UInt64, sigbits::UInt64, sig::Signal)
+@inline function add_signal(data_g::UInt64, sigbits::UInt64, sig::Signal)
+    sig.length == 0 && return data_g
     startbit_g = UInt64(sig.start_byte - 1) * UInt64(8) + UInt64(sig.start_bit - 1)
     return add_bits(data_g, sigbits, startbit_g, sig.length)
 end

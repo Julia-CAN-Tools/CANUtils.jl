@@ -46,6 +46,7 @@ module CANUtils
 
 using Printf
 using FixedSizeArrays
+using PrecompileTools
 
 # Include type definitions
 include("types/Signal.jl")
@@ -66,5 +67,34 @@ export decode!, match_and_decode!, encode, create_signal_dict
 export extract_bits, extract_signal, data_to_int
 export add_bits, add_signal, uint_to_payload
 export store_sigdict!
+
+@compile_workload begin
+    # Signal / CanFrame construction
+    sig = Signal("PrecompSig", 1, 1, 16, 0.125, 0.0)
+    sentinel = Signal()
+    frame = CanFrame(UInt32(0x0CF00400), UInt8[0x40, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+
+    # data_to_int (Vector and Tuple)
+    data_g = data_to_int(frame.data)
+    data_to_int((0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08))
+
+    # extract_bits / extract_signal
+    extract_bits(data_g, 0, 16)
+    extract_signal(data_g, sig)
+
+    # Sentinel no-op paths
+    extract_signal(data_g, sentinel)
+
+    # add_bits / add_signal / uint_to_payload
+    dg = add_bits(UInt64(0), UInt64(0xFF), 0, 8)
+    dg = add_signal(dg, UInt64(8000), sig)
+    add_signal(dg, UInt64(0), sentinel)
+    uint_to_payload(dg)
+
+    # store_sigdict!
+    sd = Dict("PrecompSig" => 0.0)
+    st = Dict("PrecompSig" => Float64[])
+    store_sigdict!(sd, st)
+end
 
 end # module CANUtils
