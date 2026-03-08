@@ -5,7 +5,7 @@ manifest_format = "2.0"
 project_hash = "99f70957eb3c59f0dc5dfdedfb53589d580938c3"
 
 [[deps.CANUtils]]
-deps = ["FixedSizeArrays", "Printf"]
+deps = ["FixedSizeArrays", "PrecompileTools", "Printf"]
 path = "."
 uuid = "cda4bd93-d5c6-49f2-9dbf-c90406d773d0"
 version = "0.2.0"
