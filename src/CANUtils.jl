@@ -45,7 +45,6 @@ See `J1939Parser.jl` for a complete reference implementation.
 module CANUtils
 
 using Printf
-using FixedSizeArrays
 using PrecompileTools
 
 # Include type definitions
@@ -95,6 +94,11 @@ export store_sigdict!
     sd = Dict("PrecompSig" => 0.0)
     st = Dict("PrecompSig" => Float64[])
     store_sigdict!(sd, st)
+
+    # show methods (exercises Printf formatting paths)
+    buf = IOBuffer()
+    show(buf, sig)
+    show(buf, frame)
 end
 
 end # module CANUtils

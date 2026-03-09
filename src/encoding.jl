@@ -78,7 +78,7 @@ payload = uint_to_payload(data_g)               # ready for CanFrame
 end
 
 """
-    uint_to_payload(data_g::UInt64) -> FixedSizeArray{UInt8}
+    uint_to_payload(data_g::UInt64) -> NTuple{8,UInt8}
 
 Convert a 64-bit integer back to an 8-byte CAN payload in little-endian byte order.
 This is the inverse of [`data_to_int`](@ref).
@@ -87,25 +87,30 @@ This is the inverse of [`data_to_int`](@ref).
 - `data_g::UInt64` — The 64-bit data word.
 
 # Returns
-A `FixedSizeArray{UInt8}` of length 8, suitable for constructing a [`CanFrame`](@ref).
+An `NTuple{8,UInt8}` suitable for constructing a [`CanFrame`](@ref).
 
 # Example
 
 ```julia
 data_g = UInt64(0x0807060504030201)
 payload = uint_to_payload(data_g)
-# payload == [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]
+# payload == (0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08)
 
 # Round-trip
 data_to_int(uint_to_payload(data_g)) == data_g  # true
 ```
 """
-function uint_to_payload(data_g::UInt64)
-    data = FixedSizeArray{UInt8}(undef, 8)
-    for i = 1:8
-        data[i] = UInt8((data_g >> (8 * (i - 1))) & UInt64(0xff))
-    end
-    return data
+function uint_to_payload(data_g::UInt64)::NTuple{8,UInt8}
+    return (
+        UInt8( data_g        & 0xff),
+        UInt8((data_g >>  8) & 0xff),
+        UInt8((data_g >> 16) & 0xff),
+        UInt8((data_g >> 24) & 0xff),
+        UInt8((data_g >> 32) & 0xff),
+        UInt8((data_g >> 40) & 0xff),
+        UInt8((data_g >> 48) & 0xff),
+        UInt8((data_g >> 56) & 0xff),
+    )
 end
 
 """

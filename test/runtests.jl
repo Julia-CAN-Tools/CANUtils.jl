@@ -1,6 +1,5 @@
 using Test
 using CANUtils
-using FixedSizeArrays
 
 @testset "CANUtils" begin
 
@@ -315,11 +314,11 @@ using FixedSizeArrays
     end
 
     # =========================================================================
-    # CanFrame with FixedSizeArray data
+    # CanFrame data type
     # =========================================================================
-    @testset "CanFrame data is FixedSizeArray" begin
+    @testset "CanFrame data is NTuple" begin
         frame = CanFrame(0x00, UInt8[0, 0, 0, 0, 0, 0, 0, 0])
-        @test frame.data isa FixedSizeArray{UInt8}
+        @test frame.data isa NTuple{8,UInt8}
     end
 
     # =========================================================================
@@ -383,7 +382,7 @@ using FixedSizeArrays
         @test @inferred(data_to_int(data_tup)) isa UInt64
         @test @inferred(add_bits(UInt64(0), UInt64(0xFF), 0, 8)) isa UInt64
         @test @inferred(add_signal(UInt64(0), UInt64(0xFF), sig)) isa UInt64
-        @test @inferred(uint_to_payload(data_g)) isa FixedSizeArrays.FixedSizeArray{UInt8}
+        @test @inferred(uint_to_payload(data_g)) isa NTuple{8,UInt8}
     end
 
 end
