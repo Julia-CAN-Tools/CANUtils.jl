@@ -181,3 +181,23 @@ sigdict = create_signal_dict([eec1])
 function create_signal_dict(messages::Vector{<:AbstractCanMessage}, extra_names::Vector{String}=String[])
     error("create_signal_dict not implemented for message type: $(eltype(messages))")
 end
+
+"""
+    message_match_key(msg::AbstractCanMessage) -> UInt32
+
+Return a hash key used for O(1) indexed lookup of this message.
+Protocol-specific: e.g. J1939 uses `canid & 0x00FFFFFF` (PF:PS:SA, ignoring priority/EDP/DP).
+"""
+function message_match_key(msg::AbstractCanMessage)::UInt32
+    error("message_match_key not implemented for message type: $(typeof(msg))")
+end
+
+"""
+    match_and_decode!(frame::CanFrame, index::Dict{UInt32,M}, sigdict::Dict{String,Float64}) where {M<:AbstractCanMessage} -> Bool
+
+Hash-indexed variant of `match_and_decode!`. Looks up the frame's match key in `index`
+for O(1) dispatch instead of linear scan.
+"""
+function match_and_decode!(frame::CanFrame, index::Dict{UInt32,M}, sigdict::Dict{String,Float64}) where {M<:AbstractCanMessage}
+    error("match_and_decode! not implemented for indexed lookup, message type: $(M)")
+end

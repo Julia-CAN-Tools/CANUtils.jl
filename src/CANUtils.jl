@@ -60,7 +60,7 @@ include("encoding.jl")
 export CanFrame, Signal, AbstractCanMessage
 
 # Export interface functions (to be implemented by parsers)
-export decode!, match_and_decode!, encode, create_signal_dict
+export decode!, match_and_decode!, encode, create_signal_dict, message_match_key
 
 # Export utility functions
 export extract_bits, extract_signal, data_to_int
