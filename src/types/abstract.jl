@@ -69,7 +69,7 @@ decode!(frame, msg, sigdict)
 sigdict["EngineRPM"]  # 512.0  (raw 4096 * 0.125)
 ```
 """
-function decode!(frame::CanFrame, message::AbstractCanMessage, sigdict::Dict{String,Float64})
+function decode!(frame::CanFrame, message::AbstractCanMessage, sigdict::AbstractDict{String,Float64})
     error("decode! not implemented for message type: $(typeof(message))")
 end
 
@@ -110,7 +110,7 @@ match_and_decode!(frame, messages, sigdict)  # true — matched EEC1
 sigdict["EngineRPM"]  # decoded value
 ```
 """
-function match_and_decode!(frame::CanFrame, messages::Vector{<:AbstractCanMessage}, sigdict::Dict{String,Float64})
+function match_and_decode!(frame::CanFrame, messages::Vector{<:AbstractCanMessage}, sigdict::AbstractDict{String,Float64})
     error("match_and_decode! not implemented for message type: $(eltype(messages))")
 end
 
@@ -198,6 +198,6 @@ end
 Hash-indexed variant of `match_and_decode!`. Looks up the frame's match key in `index`
 for O(1) dispatch instead of linear scan.
 """
-function match_and_decode!(frame::CanFrame, index::Dict{UInt32,M}, sigdict::Dict{String,Float64}) where {M<:AbstractCanMessage}
+function match_and_decode!(frame::CanFrame, index::Dict{UInt32,M}, sigdict::AbstractDict{String,Float64}) where {M<:AbstractCanMessage}
     error("match_and_decode! not implemented for indexed lookup, message type: $(M)")
 end
